@@ -4,6 +4,10 @@
 
 #df -h /
 
+# prints system hostname
+
+echo "hostname: $(hostname)"
+
 #prints timestamp when the script was executed
 
 echo "checked at $(date)"
@@ -19,3 +23,4 @@ echo "free space is $free"
 
 inodes=$(df -i / | awk 'NR==2{print $4}')
 echo "free inodes: $inodes"
+
