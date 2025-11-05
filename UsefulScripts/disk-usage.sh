@@ -16,3 +16,6 @@ echo "disk usage is $usage"
 # shows how much free space is left (4th column)
 free=$(df -hP / | awk 'NR==2{print $4}')
 echo "free space is $free"
+
+inodes=$(df -i / | awk 'NR==2{print $4}')
+echo "free inodes: $inodes"
