@@ -20,6 +20,7 @@ num=${usage%\%}
 
 #add top-bottom separator lines to format output 
 echo "------------------------------------"
+
 # formatted output (aligned columns)
 printf "%-15s %s\n" "ip:" "$ip"
 printf "%-15s %s\n" "hostname:" "$host"
@@ -27,6 +28,7 @@ printf "%-15s %s\n" "usage:" "$usage"
 printf "%-15s %s\n" "free space:" "$free"
 printf "%-15s %s\n" "free inodes:" "$inodes"
 printf "%-15s %s\n" "checked at:" "$(date '+%Y-%m-%d %H:%M:%S')"
+
 echo "------------------------------------"
 
 # compares the number with 85 (if usage >= 85 → print warning)
