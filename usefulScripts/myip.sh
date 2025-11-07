@@ -3,10 +3,15 @@
 
 # requirements:
 #   - ip command (usually installed by default)
-#   - ipcalc (needed for netmask calculation)
-#
-# install ipcalc on Debian/RPi:
-#   sudo apt install ipcalc
+
+watermark() {
+  local GRAY="\e[90m" OFF="\e[0m"
+  printf "${GRAY}— powered by silentlogicc — %s${OFF}\n"
+}
+# usage:
+# watermark
+
+##################################### Skript start ##############################################
 
 # color codes (for nicer value output)
 CYAN="\e[36m"
@@ -62,3 +67,5 @@ printf "%-10s | ${CYAN}%s${OFF}\n" "DNS"      "$dns"
 echo "-----------------------------------------------"
 printf "%-10s | %s\n" "Checked" "$(date '+%Y-%m-%d %H:%M:%S')"
 echo "-----------------------------------------------"
+
+watermark
