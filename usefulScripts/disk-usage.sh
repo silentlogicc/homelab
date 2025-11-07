@@ -1,5 +1,12 @@
 #!/bin/bash
 
+watermark() {
+  local GRAY="\e[90m" OFF="\e[0m"
+  printf "${GRAY}— powered by silentlogicc — %s ${OFF}\n"
+}
+# usage:
+# watermark
+
 # prints first IP only
 ip=$(hostname -I | awk '{print $1}')
 
@@ -35,3 +42,5 @@ echo "------------------------------------"
 if [ "$num" -ge 85 ]; then
   printf "%-15s %s\n" "warning:" "disk usage is high!"
 fi
+
+watermark
