@@ -31,6 +31,14 @@
 #   1 on unexpected errors (very unlikely in this simple flow)
 # -----------------------------------------------------------------------------
 
+watermark() {
+  local GRAY="\e[90m" OFF="\e[0m"
+  printf "${GRAY}— powered by silentlogicc — %s ${OFF}\n"
+}
+# usage:
+# watermark
+
+
 # Whether to show all interfaces (0 = only "real" ifaces; 1 = all ifaces).
 SHOW_ALL=0
 [ "$1" = "-a" ] && SHOW_ALL=1
@@ -164,3 +172,6 @@ for devpath in /sys/class/net/*; do
   # Print the final row. Cells are already padded; "|" is a visual separator.
   printf "%s|%s|%s|%s\n" "$c_if" "$c_state" "$c_ip" "$c_metric"
 done
+
+echo
+watermark
