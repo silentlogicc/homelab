@@ -8,7 +8,7 @@ if [ ! -d "$DIR" ]; then
   exit 1
 fi
 
-for f in "$DIR"/*.sh; do
+for f in "$DIR"/*.sh "$DIR"/*.py ; do
   [ -f "$f" ] || continue
   sudo chmod +x -- "$f" && echo "chmod +x $f"
 done
