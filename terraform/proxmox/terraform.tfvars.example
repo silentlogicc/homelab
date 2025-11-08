@@ -1,0 +1,8 @@
+pm_api_url          = "https://<PVE-IP>:8006/api2/json"
+pm_api_token_id     = "terraform@pve!macbook"
+pm_api_token_secret = "<SECRET>"
+ssh_public_key      = "ssh-ed25519 AAAA... mbp-arne"
+# optional overrides:
+# name      = "web02"
+# vmid      = 103
+# ipconfig0 = "ip=dhcp"
