@@ -1,6 +1,8 @@
 #!/bin/bash
 # portsv4.sh — listening sockets mit minimalistischen Farben, perfekt ausgerichtet (links)
 
+# this script has been created with AI help
+
 # needs root for full process info
 if [[ $EUID -ne 0 ]]; then
   exec sudo -E "$0" "$@"
