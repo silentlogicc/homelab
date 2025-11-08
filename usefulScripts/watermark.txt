@@ -1,0 +1,6 @@
+watermark() {
+  local GRAY="\e[90m" OFF="\e[0m"
+  printf "${GRAY}— powered by silentlogicc — %s ${OFF}\n"
+}
+# usage:
+# watermark
