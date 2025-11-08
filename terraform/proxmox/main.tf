@@ -1,41 +1,53 @@
 provider "proxmox" {
-  pm_api_url          = var.pm_api_url
-  pm_api_token_id     = var.pm_api_token_id
-  pm_api_token_secret = var.pm_api_token_secret
-  pm_tls_insecure     = true          # ok im Homelab (self-signed)
+  endpoint  = var.pm_api_url
+  api_token = "${var.pm_api_token_id}=${var.pm_api_token_secret}"
+  insecure  = true
 }
 
-resource "proxmox_vm_qemu" "web" {
-  vmid        = var.vmid
-  name        = var.name
-  target_node = var.pve_node
-  clone       = var.template_name     # -> 9000 / ubuntu-24.04-ci
-  full_clone  = true
+resource "proxmox_virtual_environment_vm" "web02" {
+  node_name = var.pve_node
+  name      = var.name
+  vm_id     = var.vmid
 
-  # Hardware
-  sockets = 1
-  cores   = var.cores
-  memory  = var.memory
+  # aus CI-Template (VM 9000) klonen
+  clone {
+    vm_id = 9000
+  }
 
-  scsihw = "virtio-scsi-pci"
-  boot   = "order=scsi0;net0"
+  cpu {
+    cores = var.cores
+  }
 
-  # Netzwerk
-  network {
-    model  = "virtio"
+  memory {
+    dedicated = var.memory
+  }
+
+  network_device {
     bridge = var.bridge
+    model  = "virtio"
   }
 
-  # Disk
   disk {
-    slot    = 0
-    type    = "scsi"
-    storage = var.storage
-    size    = var.disk_size
+    datastore_id = var.storage
+    interface    = "scsi0"
+    size         = var.disk_size # Zahl in GiB
   }
 
-  # Cloud-Init: Terraform füttert den Zettel
-  ciuser    = var.ci_user
-  sshkeys   = var.ssh_public_key
-  ipconfig0 = var.ipconfig0
+  initialization {
+    user_account {
+      username = var.ci_user
+      keys     = [var.ssh_public_key]
+    }
+    ip_config {
+      ipv4 {
+        address = "dhcp"
+      }
+    }
+  }
+
+  agent {
+    enabled = true
+  }
+
+  boot_order = ["scsi0", "net0"]
 }
