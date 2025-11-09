@@ -23,6 +23,8 @@ MEM_MB=4096                # 4 GiB
 CORES=4                    # 4 vCPUs
 CI_USER="opsadmin"         # default Cloud-Init username
 IMG_PATH="/home/silentlogicc/images/noble-server-cloudimg-amd64.img"
+SSH_KEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPmvNqMJQagcrRIj+NUgioqAgaPntBLvI6/0BYlYHgQD"
+CI_PASSWORD=""   # ⚠️ Default-Password; später ändern/entfernen
 
 # Find first free VMID starting at 9000
 VMID=9000
@@ -118,11 +120,35 @@ echo "OK: QEMU Guest Agent enabled (host side)."
 # Seed minimal Cloud-Init values: default username and DHCP for IPv4.
 # (SSH key and/or password will be added manually via UI as requested.)
 # ─────────────────────────────────────────────────────────────────────────────
-echo "Setting Cloud-Init defaults (user=${CI_USER}, IPv4=DHCP) ..."
-# Set Cloud-Init username and IPv4 via DHCP; SSH key/password will be added in UI
+echo "Setting Cloud-Init defaults (user=${CI_USER}, IPv4=DHCP, SSH key, password) ..."
+# Set username, DHCP for IPv4, Raspberry Pi SSH public key and a default password
+# Note: single quotes around the password keep the '!' safe in shells.
+echo "Setting Cloud-Init defaults (username + DHCP) ..."
 sudo qm set "${VMID}" --ciuser "${CI_USER}" --ipconfig0 "ip=dhcp"
 sleep 5
-echo "OK: Cloud-Init defaults applied."
+echo "OK: username + dhcp set."
+
+echo "Adding SSH public key ..."
+KEYFILE="$(mktemp)"
+printf '%s\n' "$SSH_KEY" | sudo tee "$KEYFILE" >/dev/null
+sudo qm set "${VMID}" --sshkeys "$KEYFILE"
+sudo rm -f "$KEYFILE"
+sleep 5
+echo "OK: ssh key set."
+
+if [ -n "$CI_PASSWORD" ]; then
+  echo "Setting default password ..."
+  sudo qm set "${VMID}" --cipassword "${CI_PASSWORD}"
+  sleep 5
+  echo "OK: password set."
+else
+  echo "skip: no default password configured."
+fi
+
+echo "Regenerating Cloud-Init ISO (this 'burns in' the config) ..."
+sudo qm cloudinit update "${VMID}"
+sleep 5
+echo "OK: cloud-init config applied."
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Final info for the operator.
