@@ -163,11 +163,27 @@ echo "Then: Start the VM once, install 'qemu-guest-agent' inside the guest,"
 echo "      shutdown cleanly, and finally 'Convert to template'."
 echo "────────────────────────────────────────────────────────"
 
+# ────────────────────────────────────────────────────────────────────────────
+# post-run workflow:
+# 1) fragt ob die frisch gebaute VM in ein Template verwandelt werden soll
+# 2) wartet sauber bis die VM wirklich komplett heruntergefahren ist
+# 3) konvertiert dann in ein Template
+# 4) wenn gewünscht: erzeugt automatisch einen ersten Full-Clone auf local-lvm
+# ────────────────────────────────────────────────────────────────────────────
+
 echo
 read -p "Do you want to convert VM ${VMID} into a template now? (y/N) " A1
 if [[ "$A1" =~ ^[Yy]$ ]]; then
   echo "freezing template..."
   sudo qm shutdown "${VMID}"
+
+  # sauber warten bis wirklich aus ist (max ~60s)
+  for i in {1..60}; do
+    state=$(qm status "${VMID}" | awk '{print $2}')
+    [[ "$state" == "stopped" ]] && break
+    sleep 1
+  done
+
   sudo qm template "${VMID}"
   echo "template created."
 
@@ -176,8 +192,11 @@ if [[ "$A1" =~ ^[Yy]$ ]]; then
   if [[ "$A2" =~ ^[Yy]$ ]]; then
     read -p "Clone VMID (new ID number): " NEWID
     read -p "Clone name: " NEWNAME
-    sudo qm clone "${VMID}" "${NEWID}" --name "${NEWNAME}"
-    echo "clone ${NEWID} created."
+
+    # immer Full Clone und immer auf local-lvm
+    sudo qm clone "${VMID}" "${NEWID}" --name "${NEWNAME}" --full=1 --storage local-lvm
+
+    echo "full clone ${NEWID} created on storage 'local-lvm'."
   else
     echo "skipped clone."
   fi
