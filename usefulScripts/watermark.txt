@@ -4,3 +4,5 @@ watermark() {
 }
 # usage:
 # watermark
+
+#add this via cmd + r into an existing nano file and add "watermark" to the bottom of the code
