@@ -14,6 +14,13 @@ set -euo pipefail
 #   Example (info only): wget https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img
 # ─────────────────────────────────────────────────────────────────────────────
 
+watermark() {
+  local GRAY="\e[90m" OFF="\e[0m"
+  printf "${GRAY}— powered by silentlogicc — %s ${OFF}\n"
+}
+# usage:
+# watermark
+
 # Configurable bits (adjust if your storage names differ)
 NAME_PREFIX="ubuntu-cloud"
 BRIDGE="vmbr0"
@@ -162,3 +169,5 @@ echo "  2) (Optional) Set a one-time password if you want password login."
 echo "Then: Start the VM once, install 'qemu-guest-agent' inside the guest,"
 echo "      shutdown cleanly, and finally 'Convert to template'."
 echo "────────────────────────────────────────────────────────"
+
+watermark
