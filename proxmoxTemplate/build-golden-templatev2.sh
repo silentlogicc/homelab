@@ -14,6 +14,18 @@ set -euo pipefail
 #   Example (info only): wget https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img
 # ─────────────────────────────────────────────────────────────────────────────
 
+watermark() {
+  local GRAY="\e[90m" OFF="\e[0m"
+  printf "${GRAY}— powered by silentlogicc — %s ${OFF}\n"
+}
+# usage:
+# watermark
+
+#add this via cmd + r into an existing nano file and add "watermark" to the bottom of the code
+
+#test
+
+
 # Configurable bits (adjust if your storage names differ)
 NAME_PREFIX="ubuntu-cloud"
 BRIDGE="vmbr0"
@@ -204,3 +216,5 @@ if [[ "$A1" =~ ^[Yy]$ ]]; then
 else
   echo "skipped template conversion."
 fi
+
+watermark
