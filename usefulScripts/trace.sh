@@ -1,5 +1,17 @@
 #!/bin/bash
 
+watermark() {
+  local GRAY="\e[90m" OFF="\e[0m"
+  printf "${GRAY}— powered by silentlogicc — %s ${OFF}\n"
+}
+# usage:
+# watermark
+
+#add this via cmd + r into an existing nano file and add "watermark" to the bottom of the code
+
+#test
+
+
 # trace.sh — show route to a host with geo info and quality rating
 
 # Colors
@@ -99,5 +111,5 @@ echo "Timeout hops (no response): $TIMEOUT_HOPS"
 echo "Fastest hop: $FASTEST_HOP (${FASTEST_MS} ms)"
 echo "Slowest hop: $SLOWEST_HOP (${SLOWEST_MS} ms)"
 echo -e "Route quality: ${QUALITY_COLOR}${QUALITY_TEXT}${OFF}"
-echo "-----------------------------------------------"
-echo -e "${GRAY}— powered by silentlogicc —${OFF}"
+
+watermark
