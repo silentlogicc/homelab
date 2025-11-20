@@ -1,6 +1,18 @@
 #!/bin/bash
 # dnscheck.sh — simple DNS lookup helper
 
+watermark() {
+  local GRAY="\e[90m" OFF="\e[0m"
+  printf "${GRAY}— powered by silentlogicc — %s ${OFF}\n"
+}
+# usage:
+# watermark
+
+#add this via cmd + r into an existing nano file and add "watermark" to the bottom of the code
+
+#test
+
+
 YELLOW=$'\e[33m'
 GREEN=$'\e[32m'
 RED=$'\e[31m'
@@ -46,3 +58,5 @@ else
     exit 1
   fi
 fi
+
+watermark
