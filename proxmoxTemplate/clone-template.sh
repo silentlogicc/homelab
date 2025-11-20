@@ -1,6 +1,12 @@
 #!/bin/bash
 # clone-template.sh — quickly clone a VM from an existing template
 
+# Require root
+if [[ $EUID -ne 0 ]]; then
+  echo "Please run this script with sudo."
+  exit 1
+fi
+
 set -e
 
 echo "----------------------------------------"
