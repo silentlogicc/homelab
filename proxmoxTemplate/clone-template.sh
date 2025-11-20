@@ -7,13 +7,13 @@ echo "----------------------------------------"
 echo " Available VM templates on this node"
 echo "----------------------------------------"
 
-# Templates finden: in /etc/pve/qemu-server/* nach 'template: 1' suchen
+# Templates über qm list + qm config finden (nicht direkt in /etc/pve greppen)
 TEMPLATE_IDS=()
 
-for cfg in /etc/pve/qemu-server/*.conf; do
-  if grep -q '^template: 1' "$cfg" 2>/dev/null; then
-    vmid="${cfg##*/}"
-    vmid="${vmid%.conf}"
+# alle VM-IDs aus qm list holen (erste Zeile ist Header -> NR>1)
+for vmid in $(qm list | awk 'NR>1 {print $1}'); do
+  # prüfen, ob diese VM ein Template ist
+  if qm config "$vmid" 2>/dev/null | grep -q '^template: 1'; then
     name=$(qm config "$vmid" | awk -F': ' '/^name:/{print $2}')
     TEMPLATE_IDS+=("$vmid")
     printf "  %s  -  %s\n" "$vmid" "$name"
@@ -21,7 +21,7 @@ for cfg in /etc/pve/qemu-server/*.conf; do
 done
 
 if [ ${#TEMPLATE_IDS[@]} -eq 0 ]; then
-  echo "❌ No templates found (no 'template: 1' in /etc/pve/qemu-server/*.conf)."
+  echo "❌ No templates found (no 'template: 1' in qm config)."
   exit 1
 fi
 
@@ -51,7 +51,7 @@ echo "----------------------------------------"
 # Clone ausführen (full clone, gleicher Storage wie Template)
 qm clone "$TEMPLATE_ID" "$NEW_VMID" --name "$NEW_NAME" --full 1
 
-# optional ein paar Standard-Settings setzen (kannst du rauswerfen, wenn du willst)
+# optional Standard-Setting
 qm set "$NEW_VMID" --onboot 1
 
 # VM starten
