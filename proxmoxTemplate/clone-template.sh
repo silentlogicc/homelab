@@ -1,5 +1,6 @@
 #!/bin/bash
 # clone-template.sh — quickly clone a VM from an existing template
+# Mode: Full Clone, target storage: local-lvm
 
 # Require root
 if [[ $EUID -ne 0 ]]; then
@@ -9,11 +10,12 @@ fi
 
 set -e
 
+STORAGE_DEFAULT="local-lvm"
+
 echo "----------------------------------------"
 echo " Available VM templates on this node"
 echo "----------------------------------------"
 
-# Templates über qm list + qm config finden (nicht direkt in /etc/pve greppen)
 TEMPLATE_IDS=()
 
 # alle VM-IDs aus qm list holen (erste Zeile ist Header -> NR>1)
@@ -50,18 +52,34 @@ if qm status "$NEW_VMID" >/dev/null 2>&1; then
   exit 1
 fi
 
+# Ziel-Storage – aktuell fest auf local-lvm, aber mit Default-Abfrage
+read -rp "Target storage [${STORAGE_DEFAULT}]: " STORAGE
+STORAGE="${STORAGE:-$STORAGE_DEFAULT}"
+
 echo "----------------------------------------"
 echo "Cloning template $TEMPLATE_ID → new VM $NEW_VMID ($NEW_NAME)…"
+echo "Mode: Full Clone"
+echo "Target storage: $STORAGE"
 echo "----------------------------------------"
 
-# Clone ausführen (full clone, gleicher Storage wie Template)
-qm clone "$TEMPLATE_ID" "$NEW_VMID" --name "$NEW_NAME" --full 1
+# Full Clone auf gewünschtes Storage (wie im Proxmox-Dialog)
+qm clone "$TEMPLATE_ID" "$NEW_VMID" \
+  --name "$NEW_NAME" \
+  --full 1 \
+  --storage "$STORAGE"
 
-# optional Standard-Setting
+# Onboot einschalten (optional, kannst du rausnehmen wenn du das nicht willst)
 qm set "$NEW_VMID" --onboot 1
 
-# VM starten
-qm start "$NEW_VMID"
+echo "Clone finished. Trying to start VM…"
 
-echo "✅ Done. New VM:"
+if qm start "$NEW_VMID"; then
+  echo "✅ VM $NEW_VMID started successfully."
+else
+  echo "⚠️ VM was cloned, but start failed. Check the Proxmox task log."
+fi
+
+echo "----------------------------------------"
 qm status "$NEW_VMID"
+echo "----------------------------------------"
+echo "Done."
